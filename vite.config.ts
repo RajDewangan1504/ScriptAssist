@@ -8,9 +8,11 @@ export default defineConfig({
   plugins: [react()],
   base: "/", // Ensure base path is set correctly for Vercel
   server: {
-    port: 5175,
-    strictPort: false 
+    host: "0.0.0.0",  // Allow access from Render
+    port:  5175, // Use Render's assigned port
+    strictPort: false
   },
+  
   build: {
     outDir: "dist"
   },
