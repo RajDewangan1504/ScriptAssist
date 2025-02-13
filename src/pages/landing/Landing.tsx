@@ -1,11 +1,19 @@
-import { FC } from 'react';
-import {Title} from "@mantine/core";
+import { FC } from "react";
+import { Title, Button, Container } from "@mantine/core";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/app.store";
+import Header from '../../components/header'
+import ResourseList from '../../components/ResourseList'
 
 const Landing: FC = () => {
-	return <>
-		<Title order={4}> Hello World </Title>
-	</>;
+
+  return (
+	<>
+	  <ResourseList/>
+	
+	  </>
+   
+  );
 };
 
-export default Landing
-
+export default Landing;
