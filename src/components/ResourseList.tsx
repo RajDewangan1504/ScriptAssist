@@ -162,7 +162,7 @@ const ResourceList: FC<ResourceListProps> = ({ category }) => {
     
 
     return (
-        <Box p="md" >
+        <Box p="md" style={{marginTop:"5%"}} >
             <Title order={2} my="xl" align="center">
                 {category} Resources
             </Title>
