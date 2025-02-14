@@ -1,121 +1,118 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { Container, Title, Text, Image, Box, Button, Loader, Card, Group, Stack } from "@mantine/core";
+
+
+import { FC, useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { 
+  Box, Title, Text, Loader, Center, Button, Stack, Card, Group, Badge, Divider 
+} from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
+import axios from "axios";
 
-interface Product {
-  id: number;
-  title: string;
-  price: number;
-  category: string;
-  description: string;
-  image: string;
-  rating: {
-    rate: number;
-    count: number;
-  };
-}
-
-interface AdditionalInfo {
-  manufacturer: string;
-  stock: number;
-}
-
-export default function ProductDetail() {
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo | null>(null);
+const ResourceDetails: FC = () => {
+  const { category, id } = useParams<{ category: string; id: string }>();
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [showMore, setShowMore] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
-    if (id) {
-      fetch(`https://fakestoreapi.com/products/${id}`)
-        .then((res) => res.json())
-        .then((data: Product) => {
-          setProduct(data);
-          return fetch(`https://dummyjson.com/products/${id}`);
-        })
-        .then((res) => res.json())
-        .then((info: any) => {
-          setAdditionalInfo({
-            manufacturer: info.brand || "Unknown Manufacturer",
-            stock: info.stock || Math.floor(Math.random() * 50) + 1,
-          });
-        })
-        .catch((error) => console.error("Error fetching product:", error))
-        .finally(() => setLoading(false));
-    }
-  }, [id]);
-
-  if (loading)
-    return (
-      <Container size="md" pt="lg" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-        <Loader size="xl" />
-      </Container>
-    );
-
-  if (!product)
-    return (
-      <Container size="md" pt="lg">
-        <Text size="lg" color="red">
-          No product found
-        </Text>
-      </Container>
-    );
+    const fetchData = async () => {
+      if (!category || !id) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get(`https://swapi.dev/api/${category.toLowerCase()}/${id}/`);
+        setData(response.data);
+      } catch (error) {
+        setError("Failed to fetch resource details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [category, id]);
 
   return (
-    <Box mx="5%" py="xl">
-      <Button onClick={() => navigate("/")} mb="lg" variant="outline" color="red">
-        ← Back to Products
-      </Button>
+    <Box p="xl" mx="auto" style={{ maxWidth: "1100px", marginTop: "3%" }}>
+      {!isMobile && (
+        <Button variant="outline" mb="lg" onClick={() => navigate(-1)}>← Back</Button>
+      )}
+      {loading ? (
+        <Center style={{ height: "60vh" }}>
+          <Loader size="lg" />
+        </Center>
+      ) : error ? (
+        <Center>
+          <Text color="red">{error}</Text>
+        </Center>
+      ) : (
+        <Card shadow="md" padding="xl" radius="md">
+          <Title order={2} mb="md" align={isMobile ? "center" : "left"}>
+            {data.name || "Resource Details"}
+          </Title>
+          <Group 
+            align="start" 
+            spacing="xl" 
+            // direction={isMobile ? "column" : "row"}
+          >
+            {/* Left: Main Information */}
+            <Box style={{ flex: 1, width: "100%" }}>
+              <Title order={4} mb="sm">Main Information</Title>
+              <Divider mb="sm" />
+              <Stack spacing="sm">
+                {Object.entries(data)
+                  .filter(([key]) => !Array.isArray(data[key]))
+                  .map(([key, value]) => (
+                    <Box key={key} style={{ display: "flex", justifyContent: "space-between" }}>
+                      <Text weight={500} size="sm">{key.replace('_', ' ').toUpperCase()}:</Text>
+                      <Text size="xs" color="dimmed">
+                        {typeof value === "object" && value !== null ? JSON.stringify(value) : String(value)}
+                      </Text>
+                    </Box>
+                ))}
+              </Stack>
+            </Box>
 
-      <Card mx={isMobile ? "5%" : "15%"} my="5%" shadow="sm" padding="lg" radius="md" withBorder>
-        <Stack spacing="md" align="center">
-          <Image src={product.image} alt={product.title} width={isMobile ? 200 : 300} height={isMobile ? 200 : 300} radius="md" />
-          <Box sx={{ textAlign: isMobile ? "center" : "left", width: "100%" }}>
-            <Title order={2}>{product.title}</Title>
-            <Text size="xl" weight={700} color="blue">
-              ${product.price.toFixed(2)}
-            </Text>
+            {/* Right: Related Resources */}
+            <Box style={{ flex: 1, width: "100%" }}>
+              <Title order={4} mb="sm">Related Resources</Title>
+              <Divider mb="sm" />
+              <Stack spacing="md">
+                {Object.entries(data)
+                  .filter(([key]) => Array.isArray(data[key]))
+                  .map(([key, value]) => (
+                    <Box key={key}>
+                      <Text weight={500} size="sm">{key.replace('_', ' ').toUpperCase()}:</Text>
+                      <Group spacing="xs" mt="xs" >
+                        {(value as string[]).map((item, index) => {
+                          const segments = item.split("/").filter(Boolean);
+                          const extractedCategory = segments[segments.length - 2];
+                          const extractedId = segments[segments.length - 1];
 
-            {!showMore && (
-              <Button mt="lg" color="gray" size="md" fullWidth={isMobile} onClick={() => setShowMore(true)}>
-                Show More Details
-              </Button>
-            )}
-
-            {showMore && (
-              <>
-                <Text size="sm" color="dimmed" mb="xs">
-                  Category: {product.category}
-                </Text>
-                <Text mt="md">{product.description}</Text>
-                <Text mt="md">
-                  ⭐ {product.rating.rate} ({product.rating.count} reviews)
-                </Text>
-
-                {additionalInfo && (
-                  <>
-                    <Text mt="md">
-                      <b>Manufacturer:</b> {additionalInfo.manufacturer}
-                    </Text>
-                    <Text mt="md">
-                      <b>Stock:</b> {additionalInfo.stock} units available
-                    </Text>
-                  </>
-                )}
-
-                <Button mt="lg" color="black" size="md" fullWidth={isMobile}>
-                  Add to Cart
-                </Button>
-              </>
-            )}
-          </Box>
-        </Stack>
-      </Card>
+                          return (
+                            <Badge
+                              key={index}
+                              color="yellow"
+                              size="lg"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => navigate(`/product/${extractedCategory}/${extractedId}`)}
+                            >
+                              {extractedCategory.toUpperCase()} {extractedId}
+                            </Badge>
+                          );
+                        })}
+                      </Group>
+                    </Box>
+                ))}
+              </Stack>
+            </Box>
+          </Group>
+        </Card>
+      )}
     </Box>
   );
-}
+};
+
+export default ResourceDetails;
+

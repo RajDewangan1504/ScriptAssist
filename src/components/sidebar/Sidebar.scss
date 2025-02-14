@@ -1,0 +1,66 @@
+/* Sidebar.scss */
+
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    background-color: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    padding-top: 50px;
+  }
+  
+  .sidebar .menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 13px;
+    border-radius: 8px;
+    color: black;
+    gap: 20px;
+    font-size: 16px;
+    width: 100%;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.2s ease;
+    margin-top: 5px;
+  }
+  
+  .sidebar .menu-item:hover {
+    background-color: #f0f0f0; /* Light gray background on hover */
+    transform: scale(1.05); /* Slight scaling effect */
+  }
+  
+  .sidebar .menu-item.active {
+    background-color: rgba(128, 128, 128, 0.463); /* Blue background for active state */
+    color: black; /* White text for active state */
+  }
+  
+  .sidebar .menu-item .icon {
+    margin-right: 10px;
+  }
+  
+  .sidebar .menu-item.active .icon {
+    color: black; /* White icon color for active state */
+  }
+  
+  .sidebar .menu-item .text {
+    flex-grow: 1;
+  }
+  
+  /* Optional: Add some padding to the sidebar content */
+  .sidebar .menu {
+    margin-top: 20px;
+  }
+  
+
+  /* Media query for mobile devices */
+@media (max-width: 768px) {
+    .sidebar {
+      display: none; /* Hide sidebar on mobile screens */
+    }
+  }
+
+

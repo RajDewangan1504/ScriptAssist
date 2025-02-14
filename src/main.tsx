@@ -21,8 +21,20 @@ export const routes = [
 						path: '/',
 						element: <Landing />
 					},
+					
 					{
-						path: "/products/:id", // Dynamic route for product details
+						path: '/starships',
+						element: <Landing />
+					},
+					{
+						path: '/planets',
+						element: <Landing />
+					},{
+						path: '/species',
+						element: <Landing />
+					},
+					{
+						path: "/product/:category/:id", // Dynamic route for product details
 						element: <ProductDetails />,
 					  },
 				]

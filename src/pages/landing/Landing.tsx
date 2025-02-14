@@ -1,19 +1,22 @@
+
+
 import { FC } from "react";
-import { Title, Button, Container } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../store/app.store";
-import Header from '../../components/header'
-import ResourseList from '../../components/ResourseList'
+import { useSearchParams } from "react-router-dom";
+import ResourseList from "../../components/ResourseList";
 
 const Landing: FC = () => {
+  const [searchParams] = useSearchParams();
+  const category = searchParams.get("category") || "Planets"; // Default category
 
   return (
-	<>
-	  <ResourseList/>
-	
-	  </>
-   
+    <>
+      <ResourseList category={category} />
+    </>
   );
 };
 
 export default Landing;
+
+
+
+  
